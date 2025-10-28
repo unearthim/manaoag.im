@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Quiet Place of Remembrance</title>
+    <meta name="description" content="An interactive, animated artwork of gently burning candles to honor and remember a loved one.">
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #0c0a10;
+            font-family: 'Inter', 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+            color: #d1d5db;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+        }
+        canvas {
+            display: block;
+        }
+        .text-overlay {
+            position: absolute;
+            top: 5%;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            background-color: rgba(0, 0, 0, 0.2);
+            pointer-events: none;
+            opacity: 0.8;
+            transition: opacity 0.5s ease-in-out;
+        }
+        .text-overlay.hidden {
+            opacity: 0;
+        }
+        h1 {
+            font-weight: 300;
+            font-size: 1.25rem;
+            margin: 0;
+            color: #9ca3af;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="candleCanvas"></canvas>
+    <div id="instructionText" class="text-overlay">
+        <h1>Click or tap to light a candle in memory</h1>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('candleCanvas');
+        const ctx = canvas.getContext('2d');
+        let candles = [];
+        let floatingParticles = [];
+        let animationFrameId;
+
+        // --- Particle class for floating embers ---
+        class FloatingParticle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = canvas.height + Math.random() * 100;
+                this.size = Math.random() * 1.5 + 0.5;
+                this.speedY = Math.random() * 1 + 0.5;
+                this.opacity = Math.random() * 0.5 + 0.2;
+                this.sway = Math.random() * 0.5 - 0.25;
+            }
+
+            update() {
+                this.y -= this.speedY;
+                this.x += Math.sin(this.y * 0.05) * this.sway;
+                if (this.y < 0) {
+                    this.y = canvas.height + Math.random() * 100;
+                    this.x = Math.random() * canvas.width;
+                }
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 220, 180, ${this.opacity})`;
+                ctx.fill();
+            }
+        }
+
+        // --- Particle class for the flame ---
+        class FlameParticle {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.size = Math.random() * 15 + 10;
+                this.speedY = Math.random() * 0.5 + 0.2;
+                this.color = `rgba(${255 + Math.random() * 20 - 10}, ${150 + Math.random() * 50 - 25}, 0, ${Math.random() * 0.5 + 0.2})`;
+                this.life = 1;
+                this.decay = Math.random() * 0.01 + 0.01;
+                this.sway = Math.random() * 0.5 - 0.25;
+            }
+
+            update() {
+                this.y -= this.speedY;
+                this.x += Math.sin(this.life * 5) * this.sway;
+                this.life -= this.decay;
+                this.size *= 0.98;
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = this.life > 0 ? this.life : 0;
+                ctx.fill();
+                ctx.closePath();
+            }
+        }
+
+        // --- Candle class ---
+        class Candle {
+            constructor(x) {
+                this.x = x;
+                this.height = Math.random() * 100 + 80;
+                this.y = canvas.height - this.height;
+                this.width = 18;
+                this.color = `hsl(30, 20%, ${Math.random() * 20 + 75}%)`;
+                this.flame = [];
+                this.wickY = this.y - 5;
+            }
+
+            draw() {
+                // Draw candle body
+                ctx.fillStyle = this.color;
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
+                ctx.shadowBlur = 15;
+                ctx.shadowOffsetY = 5;
+                ctx.fillRect(this.x - this.width / 2, this.y, this.width, this.height);
+                ctx.shadowBlur = 0;
+                ctx.shadowOffsetY = 0;
+
+                // Draw wick
+                ctx.fillStyle = '#333';
+                ctx.fillRect(this.x - 1, this.wickY, 2, 5);
+
+                // Draw flame
+                this.updateFlame();
+                this.drawFlame();
+            }
+
+            updateFlame() {
+                // Add new particles
+                if (Math.random() > 0.3) {
+                     this.flame.push(new FlameParticle(this.x, this.wickY));
+                }
+
+                // Update and filter out dead particles
+                for (let i = this.flame.length - 1; i >= 0; i--) {
+                    this.flame[i].update();
+                    if (this.flame[i].life <= 0) {
+                        this.flame.splice(i, 1);
+                    }
+                }
+            }
+
+            drawFlame() {
+                ctx.globalCompositeOperation = 'lighter';
+                
+                // Draw glow
+                const grad = ctx.createRadialGradient(this.x, this.wickY, 0, this.x, this.wickY, 50);
+                grad.addColorStop(0, 'rgba(255, 180, 50, 0.3)');
+                grad.addColorStop(1, 'rgba(255, 180, 50, 0)');
+                ctx.fillStyle = grad;
+                ctx.beginPath();
+                ctx.arc(this.x, this.wickY, 50, 0, 2 * Math.PI);
+                ctx.fill();
+
+                // Draw particles
+                this.flame.forEach(p => {
+                     p.draw();
+                });
+
+                ctx.globalAlpha = 1;
+                ctx.globalCompositeOperation = 'source-over';
+            }
+        }
+
+        function setup() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            candles = [];
+            floatingParticles = [];
+            
+            // Create initial floating particles
+            for (let i = 0; i < 50; i++) {
+                floatingParticles.push(new FloatingParticle());
+            }
+
+            // Start with one central candle
+            candles.push(new Candle(canvas.width / 2));
+
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+            }
+            animate();
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw a subtle floor gradient
+            const floorGradient = ctx.createLinearGradient(0, canvas.height - 10, 0, canvas.height);
+            floorGradient.addColorStop(0, 'rgba(255, 255, 255, 0)');
+            floorGradient.addColorStop(1, 'rgba(10, 8, 16, 0.5)');
+            ctx.fillStyle = floorGradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw and update floating particles
+            floatingParticles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+
+            candles.forEach(candle => {
+                candle.draw();
+            });
+
+            animationFrameId = requestAnimationFrame(animate);
+        }
+        
+        // --- Event Listeners ---
+        function addCandle(event) {
+            const x = event.clientX || (event.touches && event.touches[0].clientX);
+            if (x) {
+                candles.push(new Candle(x));
+            }
+            document.getElementById('instructionText').classList.add('hidden');
+        }
+
+        window.addEventListener('resize', setup);
+        window.addEventListener('click', addCandle);
+        window.addEventListener('touchstart', addCandle);
+        
+        // Initialize
+        setup();
+    </script>
+</body>
+</html>
+
