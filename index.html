@@ -3,8 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A Quiet Place of Remembrance</title>
+
+    <!-- === 1. Primary Meta Tags === -->
+    <title>A Quiet Place of Remembrance | manaoag.im</title>
+    <meta name="title" content="A Quiet Place of Remembrance | manaoag.im">
     <meta name="description" content="An interactive, animated artwork of gently burning candles to honor and remember a loved one.">
+    <meta name="keywords" content="remembrance, memory, honor, candles, interactive art, memorial, grief, loss, healing">
+    <meta name="author" content="manaoag.im (An unearth.im Project)">
+    <meta name="robots" content="index, follow">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="language" content="English">
+    
+    <!--- NON-NEGOTIABLE AND IMPORTANT:CANONICAL LINKS: if page-url.html is index.html, no need to attach it at the end of link--->
+    <link rel="canonical" href="https://manaoag.im/" />
+  
+    <!-- === 2. Webmention Endpoint === -->
+    <link rel="webmention" href="https://webmention.io/unearth.im/webmention" />
+
+    <!-- === 3. Open Graph / Facebook === -->
+    <meta property="og:type" content="website"> 
+    <meta property="og:url" content="https://manaoag.im/">
+    <meta property="og:title" content="A Quiet Place of Remembrance | manaoag.im">
+    <meta property="og:description" content="An interactive, animated artwork of gently burning candles to honor and remember a loved one.">
+    <meta property="og:image" content="https://manaoag.im/og-image.png">
+    <meta property="og:site_name" content="manaoag.im">
+
+    <!-- === 4. Twitter Card === -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://manaoag.im/">
+    <meta property="twitter:title" content="A Quiet Place of Remembrance | manaoag.im">
+    <meta property="twitter:description" content="An interactive, animated artwork of gently burning candles to honor and remember a loved one.">
+    <meta property="twitter:image" content="https://manaoag.im/og-image.png">
+
+    <!-- === 5. Favicons === -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="alternate icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+    <!-- Brand Color Meta Tags -->
+    <meta name="theme-color" content="#0c0a10">
+    <meta name="msapplication-TileColor" content="#FFB432">
+
     <style>
         body {
             margin: 0;
@@ -42,12 +81,39 @@
             margin: 0;
             color: #9ca3af;
         }
+        /* New subtle credit overlay */
+        .credit-overlay {
+            position: absolute;
+            top: 1rem; /* Margin from the top */
+            right: 1rem; /* Margin from the right */
+            font-size: 0.75rem; /* Small, subtle size */
+            color: #4b5563; /* Dark gray for subtlety */
+            pointer-events: none; /* Prevents blocking clicks on the canvas */
+            opacity: 0.7;
+            text-align: right;
+            z-index: 10;
+        }
+        /* Ensure the link inside the credit retains the subtle look and is interactive */
+        .credit-overlay a {
+            color: inherit; /* Use the same subtle color as the container */
+            text-decoration: none; /* Remove the default underline */
+            pointer-events: auto; /* Make the link clickable */
+            transition: color 0.2s;
+        }
+        .credit-overlay a:hover {
+            color: #6b7280; /* Slightly lighter gray on hover */
+        }
     </style>
 </head>
 <body>
     <canvas id="candleCanvas"></canvas>
     <div id="instructionText" class="text-overlay">
         <h1>Click or tap to light a candle in memory</h1>
+    </div>
+    
+    <!-- Updated credit element with clickable link -->
+    <div id="creditText" class="credit-overlay">
+        manaoag.im by <a href="https://unearth.im" target="_blank">unearth.im</a>
     </div>
 
     <script>
@@ -244,4 +310,3 @@
     </script>
 </body>
 </html>
-

@@ -1,0 +1,24 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="630" fill="#0c0a10"/>
+    <defs>
+        <radialGradient id="glow" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+            <stop offset="0%" stop-color="#FFDCB4" stop-opacity="0.8"/>
+            <stop offset="50%" stop-color="#FFB432" stop-opacity="0.4"/>
+            <stop offset="100%" stop-color="#0c0a10" stop-opacity="0"/>
+        </radialGradient>
+        <filter id="blur">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="15" />
+        </filter>
+    </defs>
+    <g transform="translate(600, 315) scale(2.5)">
+        <ellipse cx="0" cy="0" rx="150" ry="200" fill="url(#glow)" filter="url(#blur)"/>
+        <path d="M 0 -70 
+                 C 30 -60, 40 -30, 40 0 
+                 C 40 30, 20 60, 0 70 
+                 C -20 60, -40 30, -40 0
+                 C -40 -30, -30 -60, 0 -70 Z"
+              fill="#FFDCB4"/>
+        <path d="M 0 -50 C 20 -40, 25 -20, 25 0 C 25 20, 15 40, 0 50 C -15 40, -25 20, -25 0 C -25 -20, -20 -40, 0 -50 Z"
+              fill="#FFB432"/>
+    </g>
+</svg>
